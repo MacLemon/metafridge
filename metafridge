@@ -3,7 +3,8 @@
 
 # Defaults
 metafridgeURL="http://metafridge.metalab.at"
-metafridgeCGI="/cgi-bin/post_text.cgi"
+metafridgePostCGI="/cgi-bin/post_text.cgi"
+metafridgeGetCGI="/cgi-bin/get_text.cgi" 
 
 # If you do not want your message to go to twitter
 KILLMOCKINGBIRD=0
@@ -14,13 +15,16 @@ BREAKING=0
 # animation style. Default is scrollnormal
 STYLE=0
 
-USAGE="Usage: `basename $0` [-hk][-s style] message
+USAGE="Usage: `basename $0` [-g|-hk][-s style] message
+
+-g
+    Gets the currently displayed message from the metafridge.
 
 -h
     Displays this help text
 
 -k
-    kill a mocking bird, do not send the message to twitter as well. (Perfect for automated jobs that only make sense when seen on location, or for testing.)
+    kill a mocking bird, do not send the message to twitter as well.
 
 Available Styles:
     scrollnormal
@@ -29,14 +33,15 @@ Available Styles:
     blinkslow
     blinkfast
     blinkstrobo
-    sinewave
-"
-
-# Updated metafridge interface does not accept scrollup and scrolldown at the moment
+    sinewave"
 
 # Parse command line options.
-while getopts hks: OPT; do
+while getopts ghks: OPT; do
     case "$OPT" in
+        g)
+            curl "${metafridgeURL}${metafridgeGetCGI}"
+            exit $?;
+            ;;
         h)
             echo Help: $USAGE
             exit 0
@@ -101,6 +106,6 @@ fi
 #done
 
 MESSAGE="$*"
-curl -v "${metafridgeURL}${metafridgeCGI}" --data "killmockingbird=$KILLMOCKINGBIRD"  --data "effect=${STYLE}"  --get --data-urlencode "scroll_text=${MESSAGE}"
+curl "${metafridgeURL}${metafridgePostCGI}" --data "killmockingbird=$KILLMOCKINGBIRD"  --data "effect=${STYLE}"  --get --data-urlencode "scroll_text=${MESSAGE}"
 
 # EOF
