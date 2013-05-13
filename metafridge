@@ -39,7 +39,7 @@ Available Styles:
 while getopts ghks: OPT; do
     case "$OPT" in
         g)
-            curl "${metafridgeURL}${metafridgeGetCGI}"
+            curl -s "${metafridgeURL}${metafridgeGetCGI}" | cut -c 2-
             exit $?;
             ;;
         h)
